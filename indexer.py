@@ -5,8 +5,7 @@ import argparse
 sys.path.append("/home/tensor")
 from pythonlibs import xmlHandler
 import time
-import pickle
-
+import json
  
 entity_folder_paths = []
 with open("data_sources.txt", "r") as f:
@@ -42,7 +41,7 @@ for file in xml_file_paths:
     entity_dict_collection.append(entities)
     timer_extract_entities +=time.time()-start5
     
-with open("indexes.pickle","wb") as pckl:
-    pickle.dump(entity_dict_collection, pckl)
+with open("indexes.json","wb") as file:
+    json.dump(entity_dict_collection, file)
 
 

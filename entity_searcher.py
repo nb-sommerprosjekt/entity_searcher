@@ -5,7 +5,7 @@ import argparse
 sys.path.append("/home/tensor")
 from pythonlibs import xmlHandler
 import time
-import pickle
+import json
 start = time.time()
 
 parser = argparse.ArgumentParser(description = "search queries etc")
@@ -20,8 +20,8 @@ search_queries = [x.lower() for x in args.search_queries]
 
 #open pickle containing all a list of dictionaries that are of the form [{"entity": "filename", "entity2": "filename"....},
 # {"entity":"filename2", "entity2" : "filename2"....}...]
-with open("indexes.pickle", "rb") as pckl:
-    entity_xml_dict = pickle.load(pckl)
+with open("indexes.json", "rb") as file:
+    entity_xml_dict = json.load(file)
  
 # Performing string matching and printing of result,
 result_xml = []
