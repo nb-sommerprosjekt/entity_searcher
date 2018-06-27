@@ -4,6 +4,9 @@ import sys
 import argparse
 sys.path.append("/home/tensor")
 from pythonlibs import xmlHandler
+import time
+import pickle
+start = time.time()
 
 parser = argparse.ArgumentParser(description = "search queries etc")
 parser.add_argument("-sq","--search_queries",dest = "search_queries", type =str, nargs = '+')
@@ -11,33 +14,27 @@ parser.add_argument("-sq","--search_queries",dest = "search_queries", type =str,
 args = parser.parse_args()
 
 
+
 search_queries = [x.lower() for x in args.search_queries]
-print(search_queries)
-#search_query = sys.argv[1]
 
+
+#open pickle containing all a list of dictionaries that are of the form [{"entity": "filename", "entity2": "filename"....},
+# {"entity":"filename2", "entity2" : "filename2"....}...]
+with open("indexes.pickle", "rb") as pckl:
+    entity_xml_dict = pickle.load(pckl)
  
-entity_folder_paths = []
-with open("data_sources.txt", "r") as f:
-   for line in f:
-      entity_folder_paths.append(line.strip())
-
-
-#Extracting all files in subfolders
-xml_file_paths = []
-for folder_path in entity_folder_paths:
-    for path, subdirs, files in os.walk(folder_path):
-        for name in files:
-            xml_file_paths.append(os.path.join(path,name))
+# Performing string matching and printing of result,
 result_xml = []
+for entity_dict in entity_xml_dict:
+    if all(query in entity_dict for query in search_queries):
+       result_xml.append(entity_dict[search_queries[0]])
+   
 
-for file in xml_file_paths:
-    handler = xmlHandler.xmlHandler(inputXmlFile = file, rootNodeName = "entities")
-    res = handler.findAllNodes("entity")
-    entities = []
-    for node in res:
-       entities.append(node.text.lower())
-
-    if set(search_queries).issubset(entities):
-       result_xml.append(file)
+search_time = time.time() - start
 print(str(search_queries)+ " was found in " +str(len(result_xml))+" documents")
-print(str(result_xml)) 
+#print(str(result_xml)) 
+print("search time: {}".format(search_time))
+
+
+
+
