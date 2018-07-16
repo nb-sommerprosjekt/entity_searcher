@@ -20,7 +20,7 @@ search_queries = [x.lower() for x in args.search_queries]
 
 #open pickle containing all a list of dictionaries that are of the form [{"entity": "filename", "entity2": "filename"....},
 # {"entity":"filename2", "entity2" : "filename2"....}...]
-with open("indexes.json", "rb") as file:
+with open("indexes.json", "r") as file:
     entity_xml_dict = json.load(file)
  
 # Performing string matching and printing of result,
@@ -32,6 +32,9 @@ for entity_dict in entity_xml_dict:
 
 search_time = time.time() - start
 print(str(search_queries)+ " was found in " +str(len(result_xml))+" documents")
+with open("results.txt","w") as f:
+    for file in result_xml:
+        f.write(str(file) +"\n")
 #print(str(result_xml)) 
 print("search time: {}".format(search_time))
 

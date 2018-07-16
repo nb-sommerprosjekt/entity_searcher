@@ -8,7 +8,7 @@ import time
 import json
  
 entity_folder_paths = []
-with open("data_sources.txt", "r") as f:
+with open("data_sources2.txt", "r") as f:
    for line in f:
       entity_folder_paths.append(line.strip())
 
@@ -18,7 +18,9 @@ xml_file_paths = []
 for folder_path in entity_folder_paths:
     for path, subdirs, files in os.walk(folder_path):
         for name in files:
-            xml_file_paths.append(os.path.join(path,name))
+            if name.endswith(".entity"):
+                xml_file_paths.append(os.path.join(path,name))
+                print(os.path.join(path,name))
 result_xml = []
 travers_time = time.time()-start2
 print("travers_time: {}".format(travers_time))
@@ -41,7 +43,7 @@ for file in xml_file_paths:
     entity_dict_collection.append(entities)
     timer_extract_entities +=time.time()-start5
     
-with open("indexes.json","wb") as file:
+with open("indexes.json","w") as file:
     json.dump(entity_dict_collection, file)
 
 
