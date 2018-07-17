@@ -8,36 +8,41 @@ import time
 import json
 start = time.time()
 
-parser = argparse.ArgumentParser(description = "search queries etc")
-parser.add_argument("-sq","--search_queries",dest = "search_queries", type =str, nargs = '+')
-#parser.add_argument("-s", "--source", dest="source")
-args = parser.parse_args()
 
+class search_engine():
+    indexPath = None
+    indexes = None
+    search_queries = None
+    
+    def __init__(self, pathToIndexFile):
+        self.indexPath = pathToIndexFile
+        self.load_indexes(pathToIndexFile)
+    def load_indexes(self, indexPath):
+        #open json containing all a list of dictionaries that are of the form [{"entity$
+        # {"entity":"filename2", "entity2" : "filename2"....}...]
+        with open(self.indexPath, "r") as file:
+            self.indexes = json.load(file)
+    def search(self, search_queries):
+        self.search_queries = [x.lower() for x in search_queries]
+        self.result_file_paths =[]
+        for entity_dict in self.indexes:
+            if all(query in entity_dict for query in self.search_queries):
+                self.result_file_paths.append(entity_dict[self.search_queries[0]])
+    def printPrettyResult(self, withPaths = False):
+        
+        print(str(self.search_queries)+ " was found in " +str(len(self.result_file_paths))+" documents")                    
+        if withPaths:
+            print("De ble funnet i folgende filer: +\n\n")
+            print(self.result_file_paths)
+#open json containing all a list of dictionaries that are of the form [{"entity": "filename", "entity2": "filename"....},
+# {"entity":"filename2", "entity2" : "filename2"....}
 
-
-search_queries = [x.lower() for x in args.search_queries]
-
-
-#open pickle containing all a list of dictionaries that are of the form [{"entity": "filename", "entity2": "filename"....},
-# {"entity":"filename2", "entity2" : "filename2"....}...]
-with open("indexes.json", "r") as file:
-    entity_xml_dict = json.load(file)
- 
-# Performing string matching and printing of result,
-result_xml = []
-for entity_dict in entity_xml_dict:
-    if all(query in entity_dict for query in search_queries):
-       result_xml.append(entity_dict[search_queries[0]])
-   
-
-search_time = time.time() - start
-print(str(search_queries)+ " was found in " +str(len(result_xml))+" documents")
-with open("results.txt","w") as f:
-    for file in result_xml:
-        f.write(str(file) +"\n")
-#print(str(result_xml)) 
-print("search time: {}".format(search_time))
-
-
-
-
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description = "search queries etc")
+    parser.add_argument("-sq","--search_queries",dest = "search_queries", type =str, nargs = '+')
+    #parser.add_argument("-s", "--source", dest="source")
+    args = parser.parse_args()
+    
+    search_ent = search_engine("indexes.json")
+    search_ent.search(args.search_queries)
+    search_ent.printPrettyResult(withPaths=False)
